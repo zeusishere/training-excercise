@@ -19,7 +19,10 @@ export async function createOrder(store, request) {
       throw new OutOfStockError(product.name);
     }
 
-    const unitPriceCents = Math.trunc(product.price * 100);
+
+    // it would be better if we store the price in lower currency
+    const priceInCents = product.price * 100;
+    const unitPriceCents = Math.trunc(priceInCents);
     totalCents += unitPriceCents * item.quantity;
     reserved.push({
       product,
