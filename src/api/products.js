@@ -11,7 +11,10 @@ export function listProducts(store, url) {
   const pageSize = positiveInteger(url.searchParams.get("page_size"), 10);
   const all = store.listProducts();
 
-  const offset = page * pageSize;
+  // since page no starts from 1 offset will be multiple of pagesize, slice would ignore
+  // pageSize*1 no of products.
+  //  products(page=1, size=20 then 20 products would be ignored )
+  const offset = (page - 1) * pageSize;
   return {
     page,
     page_size: pageSize,
