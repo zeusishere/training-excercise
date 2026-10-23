@@ -4,6 +4,8 @@ import { chargePayment } from "./payments.js";
 import { validateItems } from "./validation.js";
 
 export async function createOrder(store, request) {
+  try
+  {
   const problems = validateItems(store, request.items);
   if (problems.length > 0) {
     throw new OrderValidationError(problems);
@@ -30,11 +32,17 @@ export async function createOrder(store, request) {
     totalCents = applyCoupon(store, request.coupon_code, totalCents);
   }
 
-  await chargePayment(totalCents);
-
-  for (const reservation of reserved) {
+  /* moved quantity up here, before charge payment as this will 
+     reduce the quantity of the stock before event loop switches to the next req
+     as chargePayment is an async function
+  */
+   for (const reservation of reserved) {
     reservation.product.stock -= reservation.quantity;
   }
+
+  await chargePayment(totalCents);
+
+ 
 
   return store.saveOrder({
     id: 0,
@@ -47,4 +55,7 @@ export async function createOrder(store, request) {
       unit_price_cents: reservation.unitPriceCents,
     })),
   });
+} catch (error) {
+  throw error;
+}
 }
