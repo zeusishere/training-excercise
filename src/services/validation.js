@@ -1,7 +1,8 @@
 // Problems found in submitted orders are collected here.
-const problems = [];
 
 export function validateItems(store, items) {
+  const problems = [];
+
   if (!Array.isArray(items) || items.length === 0) {
     problems.push("order must contain at least one item");
     return problems;
